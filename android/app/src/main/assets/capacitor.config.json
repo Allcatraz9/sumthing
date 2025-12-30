@@ -1,0 +1,11 @@
+{
+    "appId": "com.sum.game.fix.final",
+    "appName": "Sumthing",
+    "bundledWebRuntime": false,
+    "webDir": "www",
+    "plugins": {
+        "SplashScreen": {
+            "launchShowDuration": 0
+        }
+    }
+}

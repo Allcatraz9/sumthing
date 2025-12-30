@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description"
+        content="Sumthing - A beautiful math puzzle game. Toggle numbers to make rows and columns match their target sums!">
+    <meta name="theme-color" content="#4fd1c5">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>Sumthing - Math Puzzle Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Floating background shapes -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="shape shape-5"></div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen active">
+        <div class="start-container">
+            <div class="start-logo">
+                <div class="logo-symbol">Σ</div>
+                <h1 class="logo-text">Sumthing</h1>
+                <p class="tagline">Match the sums. Solve the puzzle.</p>
+            </div>
+
+            <div class="start-menu glass-card">
+                <!-- Mode Selector -->
+                <div class="mode-selector-menu">
+                    <span class="mode-label">Game Mode</span>
+                    <div class="mode-buttons">
+                        <button class="mode-btn active" data-mode="classic">Classic</button>
+                        <button class="mode-btn" data-mode="zen">Zen</button>
+                        <button class="mode-btn" data-mode="timed">Timed</button>
+                    </div>
+                </div>
+
+                <button class="start-btn primary" id="playBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span>Play</span>
+                </button>
+                <button class="start-btn" id="continueBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                    </svg>
+                    <span>Continue</span>
+                </button>
+                <button class="start-btn" id="startHowToPlayBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>How to Play</span>
+                </button>
+                <button class="start-btn" id="settingsStartBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                    <span>Settings</span>
+                </button>
+            </div>
+
+            <p class="version">v1.0.0</p>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen">
+        <!-- Header -->
+        <header class="header glass-card">
+            <button class="icon-btn" id="backBtn" aria-label="Back to Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+            <h1 class="logo">Sumthing</h1>
+            <button class="icon-btn" id="themeToggle" aria-label="Toggle Theme">
+                <svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" style="display: none;">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Status Bar -->
+        <div class="status-bar glass-card">
+            <div class="status-item">
+                <span class="status-label">Level</span>
+                <span class="status-value" id="levelDisplay">1</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Size</span>
+                <span class="status-value" id="sizeDisplay">5×5</span>
+            </div>
+            <div class="status-item" id="bestTimeContainer" style="display: none;">
+                <span class="status-label">Best</span>
+                <span class="status-value" id="bestTimeDisplay">--:--</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label" id="timerLabel">Time</span>
+                <span class="status-value" id="timerDisplay">00:00</span>
+            </div>
+        </div>
+
+        <!-- Game Board Container -->
+        <main class="game-container">
+            <!-- Unified board with targets as part of the grid -->
+            <div class="game-board" id="gameBoard">
+                <!-- This will be dynamically generated by JS as a unified grid -->
+            </div>
+        </main>
+
+        <!-- Action Buttons -->
+        <div class="actions">
+            <button class="action-btn" id="hintBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                    </path>
+                </svg>
+                <span>Hint</span>
+            </button>
+            <button class="action-btn" id="resetBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                </svg>
+                <span>Reset</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Win Modal -->
+    <div class="modal" id="winModal">
+        <div class="modal-content glass-card">
+            <div class="modal-icon">🎉</div>
+            <h2>Puzzle Solved!</h2>
+            <p class="modal-stats">
+                <span>Time: <strong id="winTime">00:00</strong></span>
+                <span>Moves: <strong id="winMoves">0</strong></span>
+            </p>
+            <button class="btn-primary" id="retryBtn" style="display: none;">Retry</button>
+            <button class="btn-primary" id="nextLevelBtn">Next Level</button>
+            <button class="btn-secondary" id="backToMenuBtn">Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content glass-card">
+            <h2>Settings</h2>
+            <div class="settings-list">
+                <div class="setting-item">
+                    <span>Dark Mode</span>
+                    <button class="toggle-switch" id="darkModeToggle">
+                        <span class="toggle-slider"></span>
+                    </button>
+                </div>
+                <div class="setting-item">
+                    <span>Sound Effects</span>
+                    <button class="toggle-switch" id="soundToggle">
+                        <span class="toggle-slider"></span>
+                    </button>
+                </div>
+                <div class="setting-item">
+                    <span>Vibration</span>
+                    <button class="toggle-switch active" id="vibrationToggle">
+                        <span class="toggle-slider"></span>
+                    </button>
+                </div>
+            </div>
+            <button class="btn-primary" id="closeSettingsBtn">Done</button>
+        </div>
+    </div>
+
+    <!-- How to Play Modal -->
+    <div class="modal" id="tutorialModal">
+        <div class="modal-content glass-card">
+            <h2>How to Play</h2>
+            <div class="tutorial-content">
+                <p><span>🎯</span> <span><strong>Goal:</strong> Match the target numbers at the edge of the grid.</span>
+                </p>
+                <p><span>👆</span> <span><strong>Tap</strong> numbers to toggle them on or off.</span></p>
+                <p><strong>Watch the colors:</strong></p>
+                <p><span>⚪</span> <span><strong>White</strong> means the sum is too low. Keep adding!</span></p>
+                <p><span>🟢</span> <span><strong>Green</strong> is just right! The sum is perfect.</span></p>
+                <p><span>🔴</span> <span><strong>Red</strong> means you've gone over. Turn some off!</span></p>
+                <p><span>💡</span> <span>Use <strong>Hint</strong> if you get stuck on a tricky spot.</span></p>
+                <p><span>🎊</span> <span>We'll let you know the moment the puzzle is solved!</span></p>
+            </div>
+            <button class="btn-primary" id="closeTutorialBtn">Got it!</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+</body>
+
+</html>

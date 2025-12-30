@@ -1,0 +1,14 @@
+# Standard .gitignore for Capacitor/Android
+node_modules/
+dist/
+www/
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/app/temp.keystore
+*.apk
+*.aab
+.DS_Store
+.idea/
+*.log
