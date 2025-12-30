@@ -15,10 +15,10 @@
 - **Offline First**: Works fully offline with Service Worker support.
 
 ## 📱 Screenshots
-*(Place your screenshots here in the future)*
-| Menu | Game Board | Win Screen |
-| :---: | :---: | :---: |
-| ![Menu](https://via.placeholder.com/200x400) | ![Board](https://via.placeholder.com/200x400) | ![Win](https://via.placeholder.com/200x400) |
+
+| Menu | Gameplay | How to Play | Settings |
+| :---: | :---: | :---: | :---: |
+| ![Menu](screenshots/menu.png) | ![Gameplay](screenshots/gameplay.png) | ![How to Play](screenshots/how_to_play.png) | ![Settings](screenshots/settings.png) |
 
 ## 🛠️ Tech Stack
 - **Frontend**: Vanilla HTML5, CSS3 (Modern Variables & Grid), ES6 Javascript.
