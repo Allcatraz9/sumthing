@@ -19,6 +19,18 @@
 </head>
 
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loader-container">
+            <div class="devx-brand">
+                <span class="dev">dev</span><span class="x">x</span>
+            </div>
+            <div class="loader-bar-bg">
+                <div class="loader-bar-fill"></div>
+            </div>
+            <p class="loading-text">Preparing your puzzle...</p>
+        </div>
+    </div>
     <!-- Floating background shapes -->
     <div class="bg-shapes">
         <div class="shape shape-1"></div>
@@ -224,6 +236,22 @@
             <button class="btn-primary" id="closeTutorialBtn">Got it!</button>
         </div>
     </div>
+
+    <!-- Quit Confirmation Modal -->
+    <div class="modal" id="quitModal">
+        <div class="modal-content glass-card">
+            <div class="modal-icon">👋</div>
+            <h2>Exit Sumthing?</h2>
+            <p id="quitMessage">Are you sure you want to close the app?</p>
+            <div class="modal-actions">
+                <button class="btn-primary" id="confirmQuitBtn">Exit App</button>
+                <button class="btn-secondary" id="cancelQuitBtn">Stay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification System -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <script src="game.js"></script>
     <script>

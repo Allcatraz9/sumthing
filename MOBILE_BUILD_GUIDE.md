@@ -5,12 +5,12 @@ This guide explains how to update your game, build new testing APKs, and prepare
 ## 1. Environment Setup
 
 To build this project on your system, these settings are **critical**:
-- **Java Home**: Ensure you use **Java 11** (newer versions like 17+ are currently incompatible with this Gradle version).
+- **Java Home**: Ensure you use **Java 17** (required for Android SDK 34 and Gradle 8+).
 - **Android SDK**: Ensure `ANDROID_SDK_ROOT` is set correctly.
 
 **Before running any build commands, run this in your terminal:**
 ```bash
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 export ANDROID_SDK_ROOT=/home/alcatraz/Android/Sdk
 ```
 

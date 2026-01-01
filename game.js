@@ -202,10 +202,10 @@ const PuzzleGenerator = {
             }
         }
 
-        // Ensure constraints: at least 2 active and at least 1 inactive per row
+        // Ensure constraints: min 2 active AND at least 1 inactive per row
         for (let i = 0; i < size; i++) {
             let rowActive = solution[i].filter(x => x).length;
-            // Balance active cells (min 2, max size-1)
+            // Ensure at least 2 active
             while (rowActive < 2) {
                 const j = Math.floor(Math.random() * size);
                 if (!solution[i][j]) {
@@ -213,6 +213,7 @@ const PuzzleGenerator = {
                     rowActive++;
                 }
             }
+            // Ensure at least 1 inactive (to prevent pre-solved state)
             if (rowActive === size) {
                 const j = Math.floor(Math.random() * size);
                 solution[i][j] = false;
@@ -220,22 +221,50 @@ const PuzzleGenerator = {
             }
         }
 
-        // Check columns and adjust if necessary
+        // Ensure constraints: min 2 active AND at least 1 inactive per column
         for (let j = 0; j < size; j++) {
             let colActive = 0;
             for (let i = 0; i < size; i++) if (solution[i][j]) colActive++;
 
+            // Ensure at least 2 active
             while (colActive < 2) {
                 const i = Math.floor(Math.random() * size);
                 if (!solution[i][j]) {
+                    // Before making it true, check if this would make a row all-active
+                    // If it would, we might need to pick another cell or flip a different one in that row
                     solution[i][j] = true;
                     colActive++;
                 }
             }
+
+            // Ensure at least 1 inactive
             if (colActive === size) {
                 const i = Math.floor(Math.random() * size);
                 solution[i][j] = false;
                 colActive--;
+            }
+        }
+
+        // Final pass: Ensure no row became all-active due to column adjustments
+        for (let i = 0; i < size; i++) {
+            let rowActive = solution[i].filter(x => x).length;
+            if (rowActive === size) {
+                // Find a cell that can be flipped to false without violating colActive < 2
+                let candidates = [];
+                for (let j = 0; j < size; j++) {
+                    let colActive = 0;
+                    for (let k = 0; k < size; k++) if (solution[k][j]) colActive++;
+                    if (colActive > 2) candidates.push(j);
+                }
+
+                if (candidates.length > 0) {
+                    const j = candidates[Math.floor(Math.random() * candidates.length)];
+                    solution[i][j] = false;
+                } else {
+                    // Force it anyway, 1 active is better than pre-solved
+                    const j = Math.floor(Math.random() * size);
+                    solution[i][j] = false;
+                }
             }
         }
 
@@ -274,6 +303,18 @@ const Game = {
         this.applyTheme();
         this.updateContinueButton();
         this.applySettingsUI();
+        this.initLoadingScreen();
+    },
+
+    initLoadingScreen() {
+        const loader = document.getElementById('loadingScreen');
+        if (loader) {
+            // Stay for at least 3 seconds to show off the brand
+            setTimeout(() => {
+                loader.classList.add('fade-out');
+                setTimeout(() => loader.remove(), 800);
+            }, 3000);
+        }
     },
 
     applySettingsUI() {
@@ -360,9 +401,9 @@ const Game = {
 
     loadLevel(level) {
         let size = 5;
-        if (level >= 10) size = 6;
-        if (level >= 25) size = 7;
-        if (level >= 50) size = 8;
+        if (level >= 6) size = 6;
+        if (level >= 11) size = 7;
+        if (level >= 16) size = 8;
 
         GameState.size = size;
         GameState.level = level;
@@ -409,9 +450,10 @@ const Game = {
         GameState.moves = 0;
         GameState.hintsUsed = 0;
         GameState.isComplete = false;
+        GameState.elapsedTime = 0;
+        GameState.startTime = Date.now();
 
         this.stopTimer();
-        GameState.elapsedTime = 0;
 
         // Setup initial time for Timed mode
         if (GameState.mode === 'timed') {
@@ -629,12 +671,17 @@ const Game = {
         GameState.isComplete = false;
         GameState.elapsedTime = 0;
         GameState.startTime = Date.now();
+        this.stopTimer(); // Ensure old timer is stopped
+        if (GameState.mode !== 'zen') {
+            this.startTimer();
+        }
         this.render();
         this.updateDisplay();
     },
 
     nextLevel() {
         GameState.level++;
+
         document.getElementById('winModal').classList.remove('active');
         this.loadLevel(GameState.level);
         this.render();
@@ -780,6 +827,17 @@ const Game = {
                 target.classList.add('incorrect');
             }
 
+            // Target Feedback on tap
+            target.addEventListener('click', () => {
+                const diff = GameState.colTargets[j] - currentSum;
+                let message = `Current column sum: ${currentSum}`;
+                if (diff > 0) message += ` (Need ${diff} more)`;
+                else if (diff < 0) message += ` (Over by ${Math.abs(diff)})`;
+                else message += ` (Solved!)`;
+
+                this.showToast(message, diff === 0 ? 'success' : 'info');
+            });
+
             boardEl.appendChild(target);
         }
 
@@ -817,6 +875,17 @@ const Game = {
             } else if (rowSum > GameState.rowTargets[i]) {
                 rowTarget.classList.add('incorrect');
             }
+
+            // Target Feedback on tap
+            rowTarget.addEventListener('click', () => {
+                const diff = GameState.rowTargets[i] - rowSum;
+                let message = `Current row sum: ${rowSum}`;
+                if (diff > 0) message += ` (Need ${diff} more)`;
+                else if (diff < 0) message += ` (Over by ${Math.abs(diff)})`;
+                else message += ` (Solved!)`;
+
+                this.showToast(message, diff === 0 ? 'success' : 'info');
+            });
 
             boardEl.appendChild(rowTarget);
         }
@@ -885,7 +954,7 @@ const Game = {
         });
         document.getElementById('backBtn').addEventListener('click', () => {
             SoundManager.playClick();
-            this.backToMenu();
+            this.onBackButton();
         });
         document.getElementById('themeToggle').addEventListener('click', () => {
             SoundManager.playClick();
@@ -905,6 +974,20 @@ const Game = {
         document.getElementById('backToMenuBtn').addEventListener('click', () => {
             SoundManager.playClick();
             this.backToMenu();
+        });
+
+        // Quit Modal (Exit App)
+        document.getElementById('confirmQuitBtn').addEventListener('click', () => {
+            SoundManager.playClick();
+            if (window.Capacitor && window.Capacitor.Plugins.App) {
+                window.Capacitor.Plugins.App.exitApp();
+            } else {
+                this.backToMenu(); // Fallback for browser
+            }
+        });
+        document.getElementById('cancelQuitBtn').addEventListener('click', () => {
+            SoundManager.playClick();
+            document.getElementById('quitModal').classList.remove('active');
         });
 
         // Settings modal
@@ -1070,8 +1153,81 @@ const Game = {
     // Wrapper for backward compatibility
     saveProgress() {
         this.saveSettings();
+    },
+
+    showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        const icons = {
+            success: '✅',
+            info: '💡',
+            warning: '⚠️'
+        };
+
+        toast.innerHTML = `
+            <span class="toast-icon">${icons[type] || '✨'}</span>
+            <span class="toast-message">${message}</span>
+        `;
+
+        container.appendChild(toast);
+
+        // Auto remove
+        setTimeout(() => {
+            toast.classList.add('fade-out');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    },
+
+    onBackButton() {
+        const gameActive = document.getElementById('gameScreen').classList.contains('active');
+        const startActive = document.getElementById('startScreen').classList.contains('active');
+        const anyModalActive = !!document.querySelector('.modal.active');
+
+        if (anyModalActive) {
+            this.closeAllModals();
+        } else if (gameActive) {
+            // Just go back to menu without asking
+            this.backToMenu();
+        } else if (startActive) {
+            // Sarcastic Max Payne style quotes
+            const quitQuotes = [
+                "The numbers will miss you. Well, some of them.",
+                "Go ahead. Real life is way more interesting. Obviously.",
+                "I'll just sit here in the dark. Don't mind me.",
+                "Math is hard. I totally get it.",
+                "Running away from your problems? Classic move.",
+                "I'm sure you have much more important things to do.",
+                "Real life doesn't have a 'Hint' button, you know.",
+                "Oh, was this a bit too much for you?",
+                "The solution was right there. But sure, leave.",
+                "Fine. Go be productive. See if I care.",
+                "I thought we had something special. Just another 'Sumthing' I guess."
+            ];
+
+            const randomQuote = quitQuotes[Math.floor(Math.random() * quitQuotes.length)];
+            const quitMsgEl = document.getElementById('quitMessage');
+            if (quitMsgEl) quitMsgEl.textContent = randomQuote;
+
+            document.getElementById('quitModal').classList.add('active');
+        }
     }
 };
+
+// ============================================
+// Capacitor Integration (Back Button)
+// ============================================
+if (window.Capacitor) {
+    const { App } = window.Capacitor.Plugins;
+    if (App) {
+        App.addListener('backButton', () => {
+            Game.onBackButton();
+        });
+    }
+}
 
 // ============================================
 // Initialize on DOM Ready
